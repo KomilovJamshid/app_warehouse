@@ -26,13 +26,18 @@ public class OutputProductService {
 
     public Result add(OutputProductDto outputProductDto) {
         Optional<Output> optionalOutput = outputRepository.findById(outputProductDto.getOutputId());
+        if (!optionalOutput.isPresent())
+            return new Result("Output not found", false);
+
         Optional<Product> optionalProduct = productRepository.findById(outputProductDto.getProductId());
+        if (!optionalProduct.isPresent())
+            return new Result("Product not found", false);
 
         OutputProduct outputProduct = new OutputProduct();
         outputProduct.setAmount(outputProductDto.getAmount());
         outputProduct.setPrice(outputProductDto.getPrice());
-        outputProduct.setOutput(optionalOutput.orElseGet(Output::new));
-        outputProduct.setProduct(optionalProduct.orElseGet(Product::new));
+        outputProduct.setOutput(optionalOutput.get());
+        outputProduct.setProduct(optionalProduct.get());
         outputProductRepository.save(outputProduct);
         return new Result("OutputProduct added", true);
     }
@@ -58,14 +63,22 @@ public class OutputProductService {
 
     public Result edit(Integer id, OutputProductDto outputProductDto) {
         Optional<OutputProduct> optionalOutputProduct = outputProductRepository.findById(id);
-        Optional<Output> optionalOutput = outputRepository.findById(outputProductDto.getOutputId());
-        Optional<Product> optionalProduct = productRepository.findById(outputProductDto.getProductId());
+        if (!optionalOutputProduct.isPresent())
+            return new Result("OutputProduct not found", false);
+        OutputProduct outputProduct = optionalOutputProduct.get();
 
-        OutputProduct outputProduct = optionalOutputProduct.orElseGet(OutputProduct::new);
+        Optional<Output> optionalOutput = outputRepository.findById(outputProductDto.getOutputId());
+        if (!optionalOutput.isPresent())
+            return new Result("Output not found", false);
+
+        Optional<Product> optionalProduct = productRepository.findById(outputProductDto.getProductId());
+        if (!optionalProduct.isPresent())
+            return new Result("Product not found", false);
+
         outputProduct.setAmount(outputProductDto.getAmount());
         outputProduct.setPrice(outputProductDto.getPrice());
-        outputProduct.setOutput(optionalOutput.orElseGet(Output::new));
-        outputProduct.setProduct(optionalProduct.orElseGet(Product::new));
+        outputProduct.setOutput(optionalOutput.get());
+        outputProduct.setProduct(optionalProduct.get());
         outputProductRepository.save(outputProduct);
         return new Result("OutputProduct edited", true);
     }

@@ -30,16 +30,24 @@ public class OutputService {
 
     public Result add(OutputDto outputDto) {
         Optional<Warehouse> optionalWarehouse = warehouseRepository.findById(outputDto.getWarehouseId());
+        if (!optionalWarehouse.isPresent())
+            return new Result("Warehouse not found", false);
+
         Optional<Client> optionalClient = clientRepository.findById(outputDto.getClientId());
+        if (!optionalClient.isPresent())
+            return new Result("Client not found", false);
+
         Optional<Currency> optionalCurrency = currencyRepository.findById(outputDto.getCurrencyId());
+        if (!optionalCurrency.isPresent())
+            return new Result("Currency not found", false);
 
         Output output = new Output();
         output.setDate(outputDto.getDate());
         output.setFactureName(outputDto.getFactureName());
         output.setCode(generateCode());
-        output.setWarehouse(optionalWarehouse.orElseGet(Warehouse::new));
-        output.setClient(optionalClient.orElseGet(Client::new));
-        output.setCurrency(optionalCurrency.orElseGet(Currency::new));
+        output.setWarehouse(optionalWarehouse.get());
+        output.setClient(optionalClient.get());
+        output.setCurrency(optionalCurrency.get());
         outputRepository.save(output);
         return new Result("Output saved", true);
     }
@@ -65,16 +73,27 @@ public class OutputService {
 
     public Result edit(Integer id, OutputDto outputDto) {
         Optional<Output> optionalOutput = outputRepository.findById(id);
-        Optional<Warehouse> optionalWarehouse = warehouseRepository.findById(outputDto.getWarehouseId());
-        Optional<Client> optionalClient = clientRepository.findById(outputDto.getClientId());
-        Optional<Currency> optionalCurrency = currencyRepository.findById(outputDto.getCurrencyId());
+        if (!optionalOutput.isPresent())
+            return new Result("Output nor found", false);
+        Output output = optionalOutput.get();
 
-        Output output = optionalOutput.orElseGet(Output::new);
+        Optional<Warehouse> optionalWarehouse = warehouseRepository.findById(outputDto.getWarehouseId());
+        if (!optionalWarehouse.isPresent())
+            return new Result("Warehouse not found", false);
+
+        Optional<Client> optionalClient = clientRepository.findById(outputDto.getClientId());
+        if (!optionalClient.isPresent())
+            return new Result("Client not found", false);
+
+        Optional<Currency> optionalCurrency = currencyRepository.findById(outputDto.getCurrencyId());
+        if (!optionalCurrency.isPresent())
+            return new Result("Currency not found", false);
+
         output.setDate(outputDto.getDate());
         output.setFactureName(outputDto.getFactureName());
-        output.setWarehouse(optionalWarehouse.orElseGet(Warehouse::new));
-        output.setClient(optionalClient.orElseGet(Client::new));
-        output.setCurrency(optionalCurrency.orElseGet(Currency::new));
+        output.setWarehouse(optionalWarehouse.get());
+        output.setClient(optionalClient.get());
+        output.setCurrency(optionalCurrency.get());
         outputRepository.save(output);
         return new Result("Output edited", true);
     }
